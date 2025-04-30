@@ -1,0 +1,18 @@
+CREATE TABLE user (
+    id UUID NOT NULL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    modif_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP
+);
+
+CREATE TABLE phones (
+    id UUID NOT NULL PRIMARY KEY,
+    id_user UUID NOT NULL,
+    country_code INT NOT NULL,
+    city_code INT NOT NULL,
+    number BIGINT NOT NULL,
+    CONSTRAINT fk_user FOREIGN KEY (id_user) REFERENCES user (id) ON DELETE CASCADE
+);
