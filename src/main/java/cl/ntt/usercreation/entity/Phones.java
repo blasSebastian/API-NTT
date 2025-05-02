@@ -2,6 +2,7 @@ package cl.ntt.usercreation.entity;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -26,7 +27,7 @@ public class Phones {
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false, precision = 15)
+    @Column(nullable = false)
     @JsonProperty("numero")
     private int number;
 
@@ -40,6 +41,7 @@ public class Phones {
 
     @ManyToOne
     @JoinColumn(name = "id_user", nullable = false)
+    @JsonBackReference
     private User user;
 
 }
