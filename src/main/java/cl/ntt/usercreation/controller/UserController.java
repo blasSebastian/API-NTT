@@ -21,6 +21,8 @@ import cl.ntt.usercreation.dto.UserPatchDTO;
 import cl.ntt.usercreation.entity.User;
 import cl.ntt.usercreation.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -37,40 +39,67 @@ public class UserController {
 
     @GetMapping
     @Operation(summary = "Obtener todos los usuarios", description = "Devuelve todos los usuarios y sus campos registrados")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
+            @ApiResponse(responseCode = "401", ref = "#/components/responses/401") })
     public List<User> getAllUsuarios() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Obtener usuario por ID", description = "Devuelve un usuario específico por su ID")
-    // @ApiResponses(value = {
-    // @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
-    // @ApiResponse(responseCode = "404", ref = "#/components/responses/404"),
-    // @ApiResponse(responseCode = "500", ref = "#/components/responses/500") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
+            @ApiResponse(responseCode = "401", ref = "#/components/responses/401"),
+            @ApiResponse(responseCode = "400", ref = "#/components/responses/400"),
+            @ApiResponse(responseCode = "404", ref = "#/components/responses/404"),
+            @ApiResponse(responseCode = "500", ref = "#/components/responses/500") })
     public User getUsuarioById(@PathVariable UUID id) {
         return userService.getUserById(id);
     }
 
     @PostMapping
     @Operation(summary = "Crear un nuevo usuario", description = "Crea un nuevo usuario y devuelve su información")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario Creado"),
+            @ApiResponse(responseCode = "400", ref = "#/components/responses/400"),
+            @ApiResponse(responseCode = "401", ref = "#/components/responses/401"),
+            @ApiResponse(responseCode = "500", ref = "#/components/responses/500") })
     public UserCreateResponseDTO createUsuario(@Valid @RequestBody UserCreateRequestDTO usuario) {
         return userService.createUser(usuario);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar usuario", description = "Actualiza la información de un usuario existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario Actualizado"),
+            @ApiResponse(responseCode = "400", ref = "#/components/responses/400"),
+            @ApiResponse(responseCode = "401", ref = "#/components/responses/401"),
+            @ApiResponse(responseCode = "404", ref = "#/components/responses/404"),
+            @ApiResponse(responseCode = "500", ref = "#/components/responses/500") })
     public User updateUsuario(@PathVariable UUID id, @RequestBody User usuarioDetails) {
         return userService.updateUser(id, usuarioDetails);
     }
 
     @PatchMapping("/{id}")
     @Operation(summary = "Actualizar parcialmente un usuario", description = "Actualiza parcialmente la información de un usuario existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario Actualizado"),
+            @ApiResponse(responseCode = "400", ref = "#/components/responses/400"),
+            @ApiResponse(responseCode = "401", ref = "#/components/responses/401"),
+            @ApiResponse(responseCode = "404", ref = "#/components/responses/404"),
+            @ApiResponse(responseCode = "500", ref = "#/components/responses/500") })
     public User patchUsuario(@PathVariable UUID id, @Valid @RequestBody UserPatchDTO updates) {
         return userService.patchUser(id, updates);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar usuario", description = "Elimina un usuario por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario Eliminado"),
+            @ApiResponse(responseCode = "401", ref = "#/components/responses/401"),
+            @ApiResponse(responseCode = "404", ref = "#/components/responses/404"),
+            @ApiResponse(responseCode = "500", ref = "#/components/responses/500") })
     public DeleteResponseDTO deleteUsuario(@PathVariable UUID id) {
         return userService.deleteUser(id);
     }

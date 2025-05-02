@@ -28,6 +28,9 @@ public class UserService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private PasswordRulesService passwordRulesService;
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -39,7 +42,7 @@ public class UserService {
 
     public UserCreateResponseDTO createUser(UserCreateRequestDTO userRequest) {
         isEmailExists(userRequest.getEmail());
-
+        validatePassword(userRequest.getPassword());
         User user = new User();
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
@@ -78,6 +81,8 @@ public class UserService {
     public User updateUser(UUID id, User userDetails) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserCreationException("Usuario no encontrado", HttpStatus.NOT_FOUND));
+        isEmailExists(userDetails.getEmail());
+        validatePassword(userDetails.getPassword());
 
         user.setName(userDetails.getName());
         user.setEmail(userDetails.getEmail());
@@ -111,21 +116,23 @@ public class UserService {
         }
 
         if (userPatch.getEmail() != null) {
+            isEmailExists(userPatch.getEmail());
             user.setEmail(userPatch.getEmail());
         }
 
         if (userPatch.getPassword() != null) {
+            validatePassword(userPatch.getPassword());
             user.setPassword(userPatch.getPassword());
         }
 
-        if (userPatch.isActive()) {
-            user.setActive(userPatch.isActive());
+        if (userPatch.getActive() != null) {
+            user.setActive(userPatch.getActive());
         }
 
         if (userPatch.getPhones() != null) {
 
             if (userPatch.getPhones().isEmpty())
-                throw new UserCreationException("La lista de teléfonos no puede estar vacía", HttpStatus.BAD_REQUEST);
+                throw new UserCreationException("Lista de teléfonos no puede estar vacía", HttpStatus.BAD_REQUEST);
 
             List<Phones> existingPhones = user.getPhones();
             List<Phones> newPhones = userPatch.getPhones();
@@ -141,12 +148,6 @@ public class UserService {
 
         user.setModifDate(LocalDateTime.now());
         return userRepository.save(user);
-    }
-
-    private void isEmailExists(String email) {
-        if (userRepository.existsByEmail(email)) {
-            throw new UserCreationException("El correo ya está registrado", HttpStatus.BAD_REQUEST);
-        }
     }
 
     public AuthResponseDTO sessionExists(String email, String password) {
@@ -167,6 +168,21 @@ public class UserService {
 
     public String validateToken(String token) {
         return jwtUtil.validateToken(token);
+    }
+
+    private void isEmailExists(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new UserCreationException("Correo ya está registrado", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void validatePassword(String password) {
+        if (!passwordRulesService.validatePassword(password)) {
+            String message = passwordRulesService.getRules().toString();
+
+            throw new UserCreationException("Contraseña no cumple con las siguientes reglas: " + message,
+                    HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

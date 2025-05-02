@@ -3,6 +3,7 @@ package cl.ntt.usercreation.util;
 import java.security.Key;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -14,16 +15,20 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "TuClaveSecretaSuperSeguraDe32Caracteres!";
-    private static final long EXPIRATION_TIME = 86400000; // 1 día en milisegundos
+    private final Key key;
+    private final long expirationTime;
 
-    private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    public JwtUtil(@Value("${jwt.secret}") String secretKey,
+            @Value("${jwt.expiration}") long expiration) {
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        this.expirationTime = expiration;
+    }
 
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }

@@ -45,6 +45,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 response.setContentType("application/json");
                 response.getWriter().write("{\"mensaje\": \"Token inválido\"}");
                 return;
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setContentType("application/json");
+                response.getWriter()
+                        .write("{\"mensaje\": \"Acceso denegado. No tienes permisos para acceder a este recurso.\"}");
+                return;
             }
         }
         filterChain.doFilter(request, response);

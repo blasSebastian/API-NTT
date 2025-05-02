@@ -37,7 +37,7 @@ public class User {
 
     @Column(nullable = false, unique = true)
     @JsonProperty("correo")
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "El correo no tiene un formato válido")
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Correo no tiene formato válido")
     @Schema(description = "Correo electrónico del usuario", example = "juan.perez@hola.com")
     private String email;
 

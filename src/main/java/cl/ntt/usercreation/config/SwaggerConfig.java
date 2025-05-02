@@ -27,18 +27,34 @@ public class SwaggerConfig {
                                                                                 .type(SecurityScheme.Type.HTTP)
                                                                                 .scheme("bearer")
                                                                                 .bearerFormat("JWT"))
+                                                .addResponses("400", new ApiResponse()
+                                                                .description("Error en la solicitud")
+                                                                .content(new Content().addMediaType("application/json",
+                                                                                new MediaType().schema(
+                                                                                                new Schema<ErrorResponseDTO>()
+                                                                                                                .example(new ErrorResponseDTO(
+                                                                                                                                "Correo no tiene formato válido"))))))
+                                                .addResponses("401", new ApiResponse()
+                                                                .description("No autorizado")
+                                                                .content(new Content().addMediaType("application/json",
+                                                                                new MediaType().schema(
+                                                                                                new Schema<ErrorResponseDTO>()
+                                                                                                                .example(new ErrorResponseDTO(
+                                                                                                                                "Token inválido"))))))
                                                 .addResponses("404", new ApiResponse()
                                                                 .description("Usuario no encontrado")
                                                                 .content(new Content().addMediaType("application/json",
                                                                                 new MediaType().schema(
                                                                                                 new Schema<ErrorResponseDTO>()
-                                                                                                                .example("{\"message\": \"Usuario no encontrado\"")))))
+                                                                                                                .example(new ErrorResponseDTO(
+                                                                                                                                "Usuario no encontrado"))))))
                                                 .addResponses("500", new ApiResponse()
                                                                 .description("Error interno del servidor")
                                                                 .content(new Content().addMediaType("application/json",
                                                                                 new MediaType().schema(
                                                                                                 new Schema<ErrorResponseDTO>()
-                                                                                                                .example("{\"message\": \"Ocurrió un error inesperado, favor intente más tarde\""))))))
+                                                                                                                .example(new ErrorResponseDTO(
+                                                                                                                                "Ocurrió un error inesperado, favor intente más tarde")))))))
                                 .info(new Info()
                                                 .title("API de Usuarios")
                                                 .version("1.0")

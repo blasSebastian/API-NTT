@@ -25,7 +25,7 @@ public class UserPatchDTO {
     private String password;
 
     @JsonProperty("activo")
-    private boolean active;
+    private Boolean active;
 
     @JsonProperty("telefonos")
     @Valid
