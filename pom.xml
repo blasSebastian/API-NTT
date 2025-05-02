@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>cl.ntt</groupId>
 	<artifactId>usercreation</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>war</packaging>
 	<name>API-NTT</name>
 	<description>API-NTT project for Spring Boot</description>
