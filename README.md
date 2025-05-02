@@ -31,7 +31,7 @@ Esta aplicación es una API REST para la gestión de usuarios y sus teléfonos. 
 
 ### **Configuración**
 #### **1. Configuración de JWT**
-En el archivo `application.properties` o `application.yml`, configura el secreto y el tiempo de expiración del token JWT:
+En el archivo `application.properties`, configura el secreto y el tiempo de expiración del token JWT:
 ```properties
 jwt.secret=TuClaveSecretaSuperSeguraDe32Caracteres!
 jwt.expiration=86400000
@@ -74,17 +74,80 @@ spring.sql.init.data-locations=classpath:data.sql
 ### **Endpoints Principales**
 #### **Autenticación**
 - **POST** `/api/auth/login`: Genera un token JWT para un usuario válido.
+    **Request Body:**
+    ```json
+    {
+        "correo": "juanperez@example.com",
+        "contraseña": "password123",
+    }
+    ```
 
 #### **Usuarios**
 - **GET** `/api/usuarios/{id}`: Obtiene un usuario por su ID.
 - **POST** `/api/usuarios`: Crea un nuevo usuario.
+    **Request Body:**
+    ```json
+    {
+        "nombre": "Juan Pérez",
+        "correo": "juanperez@example.com",
+        "contraseña": "password123",
+        "telefonos": [
+            {
+            "numero": "123456789",
+            "codigo_ciudad": "91",
+            "codigo_pais": "34"
+            }
+        ]
+    }
+    ```
 - **PUT** `/api/usuarios/{id}`: Actualiza un usuario existente.
+    **Request Body:**
+    ```json
+    {
+        "nombre": "Juan Pérez",
+        "correo": "juan.perez@example.com",
+        "contraseña": "12345Lk",
+        "activo": false,
+        "telefonos": [
+            {
+            "numero": 77777777,
+            "codigo_ciudad": 77,
+            "codigo_pais": 7
+            }
+        ]
+    }
+    ```
 - **PATCH** `/api/usuarios/{id}`: Actualiza parcialmente un usuario.
+    **Request Body:**
+    ```json
+    {
+        "correo": "carlosgarcia@example.com",
+        "telefonos": [
+            {
+            "numero": "555555555",
+            "codigo_ciudad": "95",
+            "codigo_pais": "34"
+            }
+        ]
+    }
+  ```
 - **DELETE** `/api/usuarios/{id}`: Elimina un usuario.
 
 #### **Contraseñas**
 - **GET** `/api/password`: Obtiene las reglas de validación de contraseñas.
 - **PUT** `/api/password`: Actualiza las reglas de validación de contraseñas.
+    **Request Body:**
+    ```json
+    {
+        "longitud_minima": 1,
+        "longitud_maxima": 20,
+        "requiere_mayuscula": true,
+        "requiere_minuscula": true,
+        "requiere_digito": false,
+        "caracter_especial": false,
+        "caracteres_permitidos": "!@#$%^&*()_+"
+    }
+    ```
 
 ---
 
@@ -104,7 +167,7 @@ src/main/java/cl/ntt/usercreation
 ---
 
 ### **Datos Iniciales**
-Los datos iniciales se cargan desde el archivo data.sql. Ejemplo de datos precargados:
+Los datos iniciales se cargan desde el archivo *data.sql*. Ejemplo de datos precargados:
 
 #### **Usuarios:**
 | ID                                    | Nombre       | Email                  | Contraseña       |
