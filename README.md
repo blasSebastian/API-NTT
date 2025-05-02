@@ -186,4 +186,7 @@ Los datos iniciales se cargan desde el archivo *data.sql*. Ejemplo de datos prec
 ### **Diagramas**
 Para ver los diagramas se debe abrir el archivo UserCreationApi.drawio en el siguiente link https://app.diagrams.net/.
 
+### **POSTMAN**
+Para la ejecución de esta API se deja un collection -> API-NTT.postman_collection.json, que puede ser importado en el programa POSTMAN.
+
 ---
