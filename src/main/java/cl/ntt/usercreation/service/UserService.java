@@ -2,7 +2,6 @@ package cl.ntt.usercreation.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import cl.ntt.usercreation.dto.AuthResponseDTO;
 import cl.ntt.usercreation.dto.DeleteResponseDTO;
-import cl.ntt.usercreation.dto.UserResponseDTO;
+import cl.ntt.usercreation.dto.UserCreateRequestDTO;
+import cl.ntt.usercreation.dto.UserCreateResponseDTO;
+import cl.ntt.usercreation.dto.UserPatchDTO;
 import cl.ntt.usercreation.entity.Phones;
 import cl.ntt.usercreation.entity.User;
 import cl.ntt.usercreation.exception.UserCreationException;
@@ -36,21 +37,32 @@ public class UserService {
                 .orElseThrow(() -> new UserCreationException("Usuario no encontrado", HttpStatus.NOT_FOUND));
     }
 
-    public UserResponseDTO createUser(User user) {
-        isEmailExists(user.getEmail());
+    public UserCreateResponseDTO createUser(UserCreateRequestDTO userRequest) {
+        isEmailExists(userRequest.getEmail());
 
+        User user = new User();
+        user.setName(userRequest.getName());
+        user.setEmail(userRequest.getEmail());
+        user.setPassword(userRequest.getPassword());
+
+        List<Phones> phones = userRequest.getPhone();
+
+        if (phones != null) {
+            phones.forEach(phone -> {
+                phone.setUser(user);
+            });
+            user.setPhones(phones);
+        }
+        // Set default values
         user.setCreationDate(LocalDateTime.now());
         user.setModifDate(LocalDateTime.now());
         user.setActive(true);
         String token = generateToken(user.getEmail());
         user.setToken(token);
 
-        if (user.getPhones() != null) {
-            user.getPhones().forEach(phone -> phone.setUser(user));
-        }
         User savedUser = userRepository.save(user);
 
-        return new UserResponseDTO(savedUser.getId(), savedUser.getCreationDate(), savedUser.getModifDate(),
+        return new UserCreateResponseDTO(savedUser.getId(), savedUser.getCreationDate(), savedUser.getModifDate(),
                 savedUser.getLastLogin(), token, savedUser.isActive());
     }
 
@@ -74,46 +86,58 @@ public class UserService {
         user.setModifDate(LocalDateTime.now());
 
         if (userDetails.getPhones() != null) {
-            userDetails.getPhones().forEach(phone -> phone.setUser(user));
-            user.setPhones(userDetails.getPhones());
+            List<Phones> existingPhones = user.getPhones();
+            List<Phones> newPhones = userDetails.getPhones();
+
+            newPhones.forEach(phone -> {
+                phone.setUser(user);
+                if (!existingPhones.contains(phone)) {
+                    existingPhones.add(phone);
+                }
+            });
+            user.setPhones(existingPhones);
         }
 
-        return userRepository.save(user);
+        userRepository.save(user);
+        return user;
     }
 
-    public User patchUser(UUID id, Map<String, Object> updates) {
+    public User patchUser(UUID id, UserPatchDTO userPatch) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserCreationException("Usuario no encontrado", HttpStatus.NOT_FOUND));
 
-        updates.forEach((key, value) -> {
-            switch (key) {
-                case "nombre":
-                    user.setName((String) value);
-                    break;
-                case "correo":
-                    user.setEmail((String) value);
-                    break;
-                case "contraseña":
-                    user.setPassword((String) value);
-                    break;
-                case "activo":
-                    user.setActive((Boolean) value);
-                    break;
-                case "telefonos":
-                    if (value instanceof List) {
-                        @SuppressWarnings("unchecked")
-                        List<Phones> phones = (List<Phones>) value;
-                        phones.forEach(phone -> phone.setUser(user));
-                        user.setPhones(phones);
-                    } else {
-                        throw new UserCreationException("El campo 'telefonos' debe ser una lista",
-                                HttpStatus.BAD_REQUEST);
-                    }
-                    break;
-                default:
-                    throw new UserCreationException("Campo " + key + " no es válido ", HttpStatus.BAD_REQUEST);
-            }
-        });
+        if (userPatch.getName() != null) {
+            user.setName(userPatch.getName());
+        }
+
+        if (userPatch.getEmail() != null) {
+            user.setEmail(userPatch.getEmail());
+        }
+
+        if (userPatch.getPassword() != null) {
+            user.setPassword(userPatch.getPassword());
+        }
+
+        if (userPatch.isActive()) {
+            user.setActive(userPatch.isActive());
+        }
+
+        if (userPatch.getPhones() != null) {
+
+            if (userPatch.getPhones().isEmpty())
+                throw new UserCreationException("La lista de teléfonos no puede estar vacía", HttpStatus.BAD_REQUEST);
+
+            List<Phones> existingPhones = user.getPhones();
+            List<Phones> newPhones = userPatch.getPhones();
+
+            newPhones.forEach(phone -> {
+                phone.setUser(user);
+                if (!existingPhones.contains(phone)) {
+                    existingPhones.add(phone);
+                }
+            });
+            user.setPhones(existingPhones);
+        }
 
         user.setModifDate(LocalDateTime.now());
         return userRepository.save(user);
