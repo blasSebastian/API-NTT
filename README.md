@@ -183,4 +183,7 @@ Los datos iniciales se cargan desde el archivo *data.sql*. Ejemplo de datos prec
 | 550e8400-e29b-41d4-a716-446655440004 | 550e8400-e29b-41d4-a716-446655440001 | 34          | 93            | 987654321  |
 | 550e8400-e29b-41d4-a716-446655440005 | 550e8400-e29b-41d4-a716-446655440002 | 34          | 95            | 555555555  |
 
+### **Diagramas**
+Para ver los diagramas se debe abrir el archivo UserCreationApi.drawio en el siguiente link https://app.diagrams.net/.
+
 ---
